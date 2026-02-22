@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>School Announcements</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #187f26; 
+            margin: 0;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px;
+        }
+
+        h1 { 
+            color: white; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); 
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container { 
+            background: rgb(91, 228, 98); 
+            padding: 40px; 
+            border-radius: 15px; 
+            width: 100%; 
+            max-width: 600px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            text-align: center; 
+        }
+
+        h2 {
+            color: #113d0d;
+            margin-top: 0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .search-container {
+            margin: 20px 0;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #searchInput:focus {
+            border-color: #3cab86;
+        }
+
+        #announcement-list {
+            margin-top: 20px;
+            text-align: left; 
+        }
+
+        .announcement { 
+            background: #f9fdfb; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            border: 1px solid #e0e0e0;
+            border-left: 5px solid #109045;
+        }
+
+        .post-date {
+            font-size: 0.85rem;
+            color: #777;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .announcement h3 { 
+            color: #109045; 
+            margin: 0 0 10px 0; 
+        }
+
+        .announcement p { 
+            color: #555; 
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            border: none;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .admin-btn { background-color: #3498db; color: white; }
+        .admin-btn:hover { background-color: #2980b9; }
+
+        .logout-btn { background-color: #ff4d4d; color: white; }
+        .logout-btn:hover { background-color: #cc0000; }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to the School Announcement System</h1>
+
+    <div class="container">
+        <h2>Latest Announcements</h2>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by title or content..." onkeyup="filterAnnouncements()">
+        </div>
+
+        <div id="announcement-list">Loading latest news...</div>
+        
+        <div class="nav-buttons">
+            <button class="btn logout-btn" onclick="logout()">Log out</button>
+        </div>
+    </div>
+
+    <script>
+        let allAnnouncements = []; 
+
+        async function fetchAnnouncements() {
+            try {
+                const response = await fetch('http://localhost:3000/users/home-data');
+                const data = await response.json();
+                allAnnouncements = data.announcements; 
+                displayAnnouncements(allAnnouncements);
+            } catch (err) {
+                document.getElementById('announcement-list').innerText = 'Failed to load announcements.';
+            }
+        }
+
+        function displayAnnouncements(posts) {
+            const list = document.getElementById('announcement-list');
+            
+            if (posts && posts.length > 0) {
+                list.innerHTML = posts.map(a => {
+                    const date = new Date(a.createdAt).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    return `
+                        <div class="announcement">
+                            <span class="post-date">📅 Posted on: ${date}</span>
+                            <h3>${a.title}</h3>
+                            <p>${a.content}</p>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                list.innerHTML = '<p style="text-align:center;">No announcements found.</p>';
+            }
+        }
+
+        function filterAnnouncements() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allAnnouncements.filter(a => 
+                a.title.toLowerCase().includes(query) || 
+                a.content.toLowerCase().includes(query)
+            );
+            displayAnnouncements(filtered);
+        }
+
+        function logout() {
+            const confirmLogout = confirm("Are you sure you want to logout?");
+            if (confirmLogout) {
+                localStorage.clear();
+                // Assumes login.html is in the same folder as home.html
+                window.location.href = 'login.html';
+            }
+        }
+
+        fetchAnnouncements();
+    </script>
+</body>
+</html>

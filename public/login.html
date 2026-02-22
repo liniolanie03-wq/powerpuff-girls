@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Login</title>
+    <style>
+        /* Modern Green Design */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #094615; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgb(69, 137, 53);
+            padding: 48px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            min-height: 40vh;
+        }
+
+        h1 { color: #fafafa;
+             margin-bottom: 20px; 
+             font-size: 32px; /* Mas malaking heading */
+             font-weight: 700; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box; 
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #052d16;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: #0d7a3a; }
+
+        .register-link { margin-top: 15px; font-size: 14px; color: #b8ea31; }
+        .register-link a { color: #ffffff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>SAS Login</h1>
+        <form id="loginForm">
+            <input id="email" type="email" placeholder="Email Address" required>
+            <input id="password" type="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div class="register-link">
+            New here? <a href="register.html">Register</a>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loginData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // 1. Save info for session handling
+                    // Using result.fullname because that is the column name in your database
+                    localStorage.setItem('userRole', result.role);
+                    localStorage.setItem('userName', result.fullname || result.name || 'User');
+
+                    // 2. DYNAMIC GREETING AND REDIRECTION
+                    if (result.role === 'admin') {
+                        alert('Login Successful! Welcome, Admin');
+                        window.location.href = 'admin.html';
+                    } else {
+                        alert('Login Successful! Welcome, Student');
+                        window.location.href = 'home.html'; 
+                    }
+                } else {
+                    alert('Login failed: ' + (result.message || 'Invalid credentials'));
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Connection error. Is your NestJS server running?');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
