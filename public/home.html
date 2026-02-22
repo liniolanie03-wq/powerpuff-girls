@@ -138,7 +138,7 @@
 
         async function fetchAnnouncements() {
             try {
-                const response = await fetch('http://localhost:3000/users/home-data');
+                const response = await fetch('https://powerpuff-girls-production.up.railway.app/users/home-data');
                 const data = await response.json();
                 allAnnouncements = data.announcements; 
                 displayAnnouncements(allAnnouncements);
