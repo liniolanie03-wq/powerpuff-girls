@@ -14,6 +14,6 @@ export class AppController {
   @Get()
   serveIndex(@Res() res: Response) {
     const html = this.appService.getIndexHtml();
-    res.type('html').send(html);
+    res.type('index.html').send(html);
   }
 }
