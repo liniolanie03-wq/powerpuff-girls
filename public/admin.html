@@ -115,11 +115,7 @@
 
 <script>
     // --- 1. SECURITY & INITIALIZATION ---
-    const userRole = localStorage.getItem('userRole');
-    if (userRole !== 'admin') {
-        alert("Access Denied!");
-        window.location.href = 'index.html';
-    }
+  
     document.getElementById('adminNameDisplay').innerText = localStorage.getItem('userName') || 'Administrator';
 
     // --- 2. LOAD ANNOUNCEMENTS ---
